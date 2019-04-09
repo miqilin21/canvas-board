@@ -1,5 +1,6 @@
 var yyy = document.getElementById('xxx');
 var context = yyy.getContext('2d');
+var lineWidth = 5
 
 autoSetCanvasSize(yyy)
 
@@ -16,6 +17,20 @@ eraser.onclick = function(){
   eraserEnabled = true
   eraser.classList.add('active')
   pen.classList.remove('active')
+}
+
+clear.onclick = function(){
+  context.clearRect(0, 0, yyy.width, yyy.height);
+}
+
+download.onclick = function(){
+  var url = yyy.toDataURL("image/png")
+  var a = document.createElement('a')
+  document.body.appendChild(a)
+  a.href = url
+  a.download = '我的画'
+  a.target = '_blank'
+  a.click()
 }
 
 red.onclick = function(){
@@ -38,6 +53,13 @@ blue.onclick = function(){
   blue.classList.add('active')
   green.classList.remove('active')
   red.classList.remove('active')
+}
+
+thin.onclick = function(){
+  lineWidth = 5
+}
+thick.onclick = function(){
+  lineWidth = 10
 }
 
 /******/
@@ -67,7 +89,7 @@ function drawCircle(x, y, radius) {
 function drawLine(x1, y1, x2, y2) {
   context.beginPath();
   context.moveTo(x1, y1) // 起点
-  context.lineWidth = 5
+  context.lineWidth = lineWidth
   context.lineTo(x2, y2) // 终点
   context.stroke()
   context.closePath()
@@ -157,7 +179,7 @@ function listenToUser(canvas) {
   }
 } 
     
-  
+ 
 
 
 
