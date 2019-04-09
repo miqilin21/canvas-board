@@ -15,6 +15,9 @@ ul ,ol{
 #xxx{
     background: white;
     display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
   }
   
 body{
