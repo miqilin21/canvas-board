@@ -34,6 +34,12 @@ download.onclick = function(){
   a.click()
 }
 
+/*download.onclick = function(){
+  var image = yyy.toDataURL("image/png").replace("image/png", "image/octet-stream"); 
+  console.log('image')
+  window.location.href = image;
+}*/
+
 red.onclick = function(){
   context.fillStyle = 'red'
   context.strokeStyle = 'red'
