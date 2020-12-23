@@ -1,40 +1,43 @@
 <!DOCTYPE html>
 <html lang="zh-Hans">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
-    <title>我的画板</title>
-    <link rel="stylesheet" href="./style.css">
-</head>
-<body>
-    <canvas id="xxx" width=300 height=300></canvas>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0"
+    />
+    <title>我的在线画板</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="xxx" width="300" height="300"></canvas>
     <div id="actions" class="actions">
-        <svg id="pen" class="active icon">
-            <use xlink:href="#icon-qianbi"></use>
-        </svg>
-        <svg id="eraser" class="icon">
-            <use xlink:href="#icon-tubiaoku-"></use>
-        </svg> 
-        <svg id="clear" class="icon">
-            <use xlink:href="#icon-shanchu"></use>
-        </svg> 
-        <svg id="download" class="icon">
-            <use xlink:href="#icon-save"></use>
-        </svg> 
+      <svg id="pen" class="active icon">
+        <use xlink:href="#icon-qianbi"></use>
+      </svg>
+      <svg id="eraser" class="icon">
+        <use xlink:href="#icon-tubiaoku-"></use>
+      </svg>
+      <svg id="clear" class="icon">
+        <use xlink:href="#icon-shanchu"></use>
+      </svg>
+      <svg id="download" class="icon">
+        <use xlink:href="#icon-save"></use>
+      </svg>
     </div>
     <ol class="colors">
-        <li id="red" class="active red"></li>
-        <li id="green" class="green"></li>
-        <li id="blue" class="blue"></li>
+      <li id="red" class="active red"></li>
+      <li id="green" class="green"></li>
+      <li id="blue" class="blue"></li>
     </ol>
     <ol class="sizes">
-        <li id="thin" class="thin"></li>
-        <li id="thick" class="thick"></li>
+      <li id="thin" class="thin"></li>
+      <li id="thick" class="thick"></li>
     </ol>
 
     <script src="./main.js"></script>
     <script src="//at.alicdn.com/t/font_1132899_gvsgt7wtw3d.js"></script>
-</body>
+  </body>
 </html>
