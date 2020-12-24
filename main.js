@@ -1,217 +1,193 @@
-var yyy = document.getElementById("xxx");
-var context = yyy.getContext("2d");
-var lineWidth = 5;
+let canvas = document.getElementById("drawing-board");
+let ctx = canvas.getContext("2d");
+let eraser = document.getElementById("eraser");
+let brush = document.getElementById("brush");
+let reSetCanvas = document.getElementById("clear");
+let aColorBtn = document.getElementsByClassName("color-item");
+let save = document.getElementById("save");
+let undo = document.getElementById("undo");
+let range = document.getElementById("range");
+let clear = false;
+let activeColor = "black";
+let lWidth = 4;
 
-autoSetCanvasSize(yyy);
+autoSetSize(canvas);
 
-listenToUser(yyy);
+setCanvasBg("white");
 
-var eraserEnabled = false;
-pen.onclick = function () {
-  eraserEnabled = false;
-  pen.classList.add("active");
-  eraser.classList.remove("active");
-};
-eraser.onclick = function () {
-  eraserEnabled = true;
-  eraser.classList.add("active");
-  pen.classList.remove("active");
-};
+listenToUser(canvas);
 
-clear.onclick = function () {
-  context.clearRect(0, 0, yyy.width, yyy.height);
-};
+getColor();
 
-download.onclick = function () {
-  var url = yyy.toDataURL("image/png");
-  var a = document.createElement("a");
-  document.body.appendChild(a);
-  a.href = url;
-  a.download = "my-paint";
-  a.target = "_blank";
-  a.click();
-};
+function autoSetSize(canvas) {
+  canvasSetSize();
 
-/*download.onclick = function(){
-  var image = yyy.toDataURL("image/png").replace("image/png", "image/octet-stream"); 
-  console.log('image')
-  window.location.href = image;
-}*/
-// black.onclick = function () {
-//   context.fillStyle = "black";
-//   context.strokeStyle = "black";
-//   black.classList.add("active");
-//   red.classList.remove("active");
-//   green.classList.remove("active");
-//   blue.classList.remove("active");
-// };
-// red.onclick = function () {
-//   context.fillStyle = "red";
-//   context.strokeStyle = "red";
-//   red.classList.add("active");
-//   black.classList.remove("active");
-//   green.classList.remove("active");
-//   blue.classList.remove("active");
-// };
-// green.onclick = function () {
-//   context.fillStyle = "green";
-//   context.strokeStyle = "green";
-//   green.classList.add("active");
-//   black.classList.remove("active");
-//   red.classList.remove("active");
-//   blue.classList.remove("active");
-// };
-// blue.onclick = function () {
-//   context.fillStyle = "blue";
-//   context.strokeStyle = "blue";
-//   blue.classList.add("active");
-//   black.classList.remove("active");
-//   green.classList.remove("active");
-//   red.classList.remove("active");
-// };
-
-var listenerColors = function () {
-  var penColors = document.querySelector(".colors");
-  penColors.addEventListener("click", function (event) {
-    var target = event.target;
-    var color = target.dataset.color;
-    context.fillStyle = color;
-    context.strokeStyle = color;
-
-    var targetChild = target.parentElement.children;
-    for (var i = 0; i < targetChild.length; i++) {
-      targetChild[i].classList.remove("active");
-    }
-    target.classList.add("active");
-  });
-};
-
-listenerColors();
-
-small.onclick = function () {
-  lineWidth = 4;
-};
-medium.onclick = function () {
-  lineWidth = 8;
-};
-big.onclick = function () {
-  lineWidth = 12;
-};
-/******/
-
-function autoSetCanvasSize(canvas) {
-  setCanvasSize();
-
-  window.onresize = function () {
-    setCanvasSize();
-  };
-
-  function setCanvasSize() {
-    var pageWidth = document.documentElement.clientWidth;
-    var pageHeight = document.documentElement.clientHeight;
+  function canvasSetSize() {
+    let pageWidth = document.documentElement.clientWidth;
+    let pageHeight = document.documentElement.clientHeight;
 
     canvas.width = pageWidth;
     canvas.height = pageHeight;
   }
+
+  window.onresize = function () {
+    canvasSetSize();
+  };
 }
 
-function drawCircle(x, y, radius) {
-  context.beginPath();
-  context.arc(x, y, radius, 0, Math.PI * 2);
-  context.fill();
-}
-
-function drawLine(x1, y1, x2, y2) {
-  context.beginPath();
-  context.moveTo(x1, y1); // 起点
-  context.lineWidth = lineWidth;
-  context.lineTo(x2, y2); // 终点
-  context.stroke();
-  context.closePath();
+function setCanvasBg(color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "black";
 }
 
 function listenToUser(canvas) {
-  var using = false;
-  var lastPoint = {
-    x: undefined,
-    y: undefined,
-  };
-  //特性检测
+  let painting = false;
+  let lastPoint = { x: undefined, y: undefined };
+
   if (document.body.ontouchstart !== undefined) {
-    //触屏设备
-
-    canvas.ontouchstart = function (aaa) {
-      var x = aaa.touches[0].clientX;
-      var y = aaa.touches[0].clientY;
-      console.log(x, y);
-      using = true;
-      if (eraserEnabled) {
-        context.clearRect(x - 5, y - 5, 10, 10);
-      } else {
-        lastPoint = {
-          x: x,
-          y: y,
-        };
-      }
+    canvas.ontouchstart = function (e) {
+      this.firstDot = ctx.getImageData(0, 0, canvas.width, canvas.height); //在这里储存绘图表面
+      saveData(this.firstDot);
+      painting = true;
+      let x = e.touches[0].clientX;
+      let y = e.touches[0].clientY;
+      lastPoint = { x: x, y: y };
+      ctx.save();
+      drawCircle(x, y, 0);
     };
-    canvas.ontouchmove = function (aaa) {
-      var x = aaa.touches[0].clientX;
-      var y = aaa.touches[0].clientY;
-
-      if (!using) {
-        return;
-      }
-
-      if (eraserEnabled) {
-        context.clearRect(x - 5, y - 5, 10, 10);
-      } else {
-        var newPoint = {
-          x: x,
-          y: y,
-        };
+    canvas.ontouchmove = function (e) {
+      if (painting) {
+        let x = e.touches[0].clientX;
+        let y = e.touches[0].clientY;
+        let newPoint = { x: x, y: y };
         drawLine(lastPoint.x, lastPoint.y, newPoint.x, newPoint.y);
         lastPoint = newPoint;
       }
     };
-    canvas.ontouchend = function (aaa) {
-      using = false;
+
+    canvas.ontouchend = function () {
+      painting = false;
     };
   } else {
-    //非触屏设备
-    canvas.onmousedown = function (aaa) {
-      var x = aaa.clientX;
-      var y = aaa.clientY;
-      using = true;
-      if (eraserEnabled) {
-        context.clearRect(x - 5, y - 5, 10, 10);
-      } else {
-        lastPoint = {
-          x: x,
-          y: y,
-        };
-      }
+    canvas.onmousedown = function (e) {
+      this.firstDot = ctx.getImageData(0, 0, canvas.width, canvas.height); //在这里储存绘图表面
+      saveData(this.firstDot);
+      painting = true;
+      let x = e.clientX;
+      let y = e.clientY;
+      lastPoint = { x: x, y: y };
+      ctx.save();
+      drawCircle(x, y, 0);
     };
-    canvas.onmousemove = function (aaa) {
-      var x = aaa.clientX;
-      var y = aaa.clientY;
-
-      if (!using) {
-        return;
-      }
-
-      if (eraserEnabled) {
-        context.clearRect(x - 5, y - 5, 10, 10);
-      } else {
-        var newPoint = {
-          x: x,
-          y: y,
-        };
-        drawLine(lastPoint.x, lastPoint.y, newPoint.x, newPoint.y);
+    canvas.onmousemove = function (e) {
+      if (painting) {
+        let x = e.clientX;
+        let y = e.clientY;
+        let newPoint = { x: x, y: y };
+        drawLine(lastPoint.x, lastPoint.y, newPoint.x, newPoint.y, clear);
         lastPoint = newPoint;
       }
     };
-    canvas.onmouseup = function (aaa) {
-      using = false;
+
+    canvas.onmouseup = function () {
+      painting = false;
+    };
+
+    canvas.mouseleave = function () {
+      painting = false;
     };
   }
 }
+
+function drawCircle(x, y, radius) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+  if (clear) {
+    ctx.clip();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
+}
+
+function drawLine(x1, y1, x2, y2) {
+  ctx.lineWidth = lWidth;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  if (clear) {
+    ctx.save();
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.closePath();
+    ctx.clip();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  } else {
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.closePath();
+  }
+}
+
+range.onchange = function () {
+  lWidth = this.value;
+};
+
+eraser.onclick = function () {
+  clear = true;
+  this.classList.add("active");
+  brush.classList.remove("active");
+};
+
+brush.onclick = function () {
+  clear = false;
+  this.classList.add("active");
+  eraser.classList.remove("active");
+};
+
+reSetCanvas.onclick = function () {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  setCanvasBg("white");
+};
+
+save.onclick = function () {
+  let imgUrl = canvas.toDataURL("image/png");
+  let saveA = document.createElement("a");
+  document.body.appendChild(saveA);
+  saveA.href = imgUrl;
+  saveA.download = "zspic" + new Date().getTime();
+  saveA.target = "_blank";
+  saveA.click();
+};
+
+function getColor() {
+  for (let i = 0; i < aColorBtn.length; i++) {
+    aColorBtn[i].onclick = function () {
+      for (let i = 0; i < aColorBtn.length; i++) {
+        aColorBtn[i].classList.remove("active");
+        this.classList.add("active");
+        activeColor = this.style.backgroundColor;
+        ctx.fillStyle = activeColor;
+        ctx.strokeStyle = activeColor;
+      }
+    };
+  }
+}
+
+let historyDeta = [];
+
+function saveData(data) {
+  historyDeta.length === 10 && historyDeta.shift(); // 上限为储存10步，太多了怕挂掉
+  historyDeta.push(data);
+}
+
+undo.onclick = function () {
+  if (historyDeta.length < 1) return false;
+  ctx.putImageData(historyDeta[historyDeta.length - 1], 0, 0);
+  historyDeta.pop();
+};
