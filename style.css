@@ -13,9 +13,6 @@ body {
   top: 0;
   left: 0;
   cursor: crosshair;
-  background-size: 18px 18px;
-  background-image: linear-gradient(to right, #f5f6f7 1px, transparent 1px),
-    linear-gradient(to bottom, #f5f6f7 1px, transparent 1px);
 }
 .tools {
   position: fixed;
